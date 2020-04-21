@@ -1,0 +1,483 @@
+$(function() {
+	
+	
+		 
+		 
+	hoverMenu();
+	dropdownToggle();
+	controlloTestata();
+	checkCookie_eu();
+	
+	//altezza di azuremediaplayer in base all'aspect-ratio 16/9
+//	$(".azuremediaplayer").height(($(".azuremediaplayer").width()*9)/16);
+	
+	//Gestione dell'icona freccia nel top menu
+	$('#navbar-inverse-button').on('click', function(e) {
+	  $('.navbar-arrow').toggleClass("up"); //you can list several class names 
+	  e.preventDefault();
+	});
+
+	//Magamenu sezione media: cambio dell'immagine in base a link
+	
+	var $image = $("#submenuImage1");
+	  $image.data("old-src", $image.attr("src"));
+	  $(".nav_tradeshow").hover(function() {
+		$image.attr("src", $(this).data("image-src"));
+	  }, function() {
+		$image.attr("src", $image.data("old-src"));
+	  });
+	
+	//Carousel
+	$('#featured-carousel').carousel({
+		interval: 6000 //changes the speed
+	})
+	$('#meteo-carousel').carousel({
+		interval: 4000 //changes the speed
+	})
+	$('#news-carousel1').carousel({
+		interval:   false
+	});
+	$('#news-carousel2').carousel({
+		interval:   false
+	});
+	
+	$('#news-carousel3').carousel({
+		interval:   4000
+	});
+	$('#news-carousel4').carousel({
+		interval:   false
+	});
+	$('#article-carousel').carousel({
+		interval:   false
+	});
+	$('#terzo-livello-mobile').carousel({
+		interval:   false
+	});
+	
+	
+	$('.responsive').slick({
+	  dots: true,
+	  infinite: true,
+	  speed: 300,
+	  slidesToShow: 4,
+	  slidesToScroll: 4,
+	  initialSlide: 8,
+	  responsive: [
+		{
+		  breakpoint: 1024,
+		  settings: {
+			slidesToShow: 3,
+			slidesToScroll: 3,
+			infinite: true,
+			dots: true
+		  }
+		},
+		{
+		  breakpoint: 600,
+		  settings: {
+			slidesToShow: 2,
+			slidesToScroll: 2
+		  }
+		},
+		{
+		  breakpoint: 480,
+		  settings: {
+			slidesToShow: 1,
+			slidesToScroll: 1
+		  }
+		}
+	  ]
+	});
+	
+	
+	$('.archive-slider').slick({
+	  dots: false,
+	  infinite: false,
+	  speed: 300,
+	  slidesToShow: 6,
+	  slidesToScroll: 6,
+	  responsive: [
+		{
+		  breakpoint: 992,
+		  settings: {
+			slidesToShow: 4,
+			slidesToScroll: 4
+		  }
+		},
+		{
+		  breakpoint: 768,
+		  settings: {
+			slidesToShow: 4,
+			slidesToScroll: 4,
+			arrows: true,
+			dots: true
+			
+		  }
+		}
+	  ]
+	});
+	
+	
+	
+	
+
+	$("#cookie_accept").click(function(){
+		setCookie_eu("cookies_consent", 1, 30);
+	});
+	
+
+	 if ($('.main-text').length) {
+		//Aumenta/diminuisci grandezza font
+		//min font size
+		var min=12; 	
+		//max font size
+		var max=20;	
+		//grab the default font size
+		var reset = $('.main-text').css('fontSize'); 
+		//font resize these elements
+		var elm = $('.main-text');  
+		//set the default font size and remove px from the value
+		var size = str_replace(reset, 'px', ''); 
+	
+	
+		//Increase font size
+		$('a.aumentaFont').click(function() {
+			//if the font size is lower or equal than the max value
+			if (size<=max) {
+				//increase the size
+				size++;
+				//set the font size
+				elm.css({'fontSize' : size});
+			}
+			//cancel a click event
+			return false;	
+			
+		});
+	
+		$('a.diminuisciFont').click(function() {
+			//if the font size is greater or equal than min value
+			if (size>=min) {
+				//decrease the size
+				size--;
+				//set the font size
+				elm.css({'fontSize' : size});
+			}
+			//cancel a click event
+			return false;	
+		});
+		
+		
+	};
+	
+	// Stampa pagina
+	$(".stampaPagina").click(function() {
+		window.print();
+	});
+	
+	// effetto rollover sul testo di fotogallery-eventi-dipendenti
+	$( "#fotogallery-eventi-dipendenti a" ).mouseover(function() {
+		$(this).parent().addClass('hover');
+	});
+	$( "#fotogallery-eventi-dipendenti a" ).mouseout(function() {
+		$(this).parent().removeClass('hover');
+	});
+	
+	
+	// Controllo valori immessi nella pagina di Login
+	$("#accesso").click(function() {
+		var username = $("#username").val();
+		var password = $("#password").val();
+		// Checking for blank fields.
+		if (username == '') {
+			$('#username').addClass('has-error');
+			return false;
+		} 	
+		if (password == '') {
+			$('#password').addClass('has-error');
+			return false;
+		} 	
+		
+	});
+	
+	// Funzioni nello sticky menu
+	$("#search-box-apri").click(function() {
+		$("#search-box").show().css({"width":"40px"}).animate({"width":"270px"}, "fast");
+	});
+	$("#search-box-chiudi").click(function() {
+		$("#search-box").hide();
+	});
+	$("#search-box-cerca").click(function() {
+		$("#search-box-trova").submit();
+	});
+	$("#mostra-funzioni").click(function() {
+		if($("#sticky-main-menu").is(':visible')){
+			$("#sticky-menu-funzioni").show();
+			$("#sticky-main-menu").hide();
+			$("#mostra-funzioni i").removeClass("fa-angle-right");
+			$("#mostra-funzioni i").addClass("fa-angle-left");
+		} else {
+			$("#sticky-menu-funzioni").hide();
+			$("#sticky-main-menu").show();
+			$("#mostra-funzioni i").removeClass("fa-angle-left");
+			$("#mostra-funzioni i").addClass("fa-angle-right");
+		}
+			
+	});
+
+	// gallery - apertura dell'immagine selezionata sulla modale
+	$(".thumb-gallery [data-pic]").click(function() {
+	  window.location.hash = $(this).data("pic");
+	});
+	 					
+	// gallery - eliminazione dei contenuti caricati precedentemente per effettuare un nuovo caricamento alla riapertura
+	
+         $('#myModal').on('hidden.bs.modal', function () {
+	    $(this).removeData('bs.modal');
+	 })
+
+	//leggi tutto
+	$(".morelink").click(function(){
+		var $moreTextIt = "Leggi tutto";
+		var $lessTextIt = "Leggi meno";
+		var $moreTextEn = "Read more";
+		var $lessTextEn = "Read less";
+		var $delta = 400;
+		var $speed = 500;
+	
+		if($(this).hasClass("less")) {
+			$(this).removeClass("less");
+			if ($("#mla").text() === $lessTextIt) {
+				$("#mla").text($moreTextIt);
+			}
+			else {
+				$("#mla").text($moreTextEn);
+			}
+			$('.text-more').css('display','none');
+			$("html, body").animate({ scrollTop: $('#mla').offset().top - $delta }, $speed);
+		} else {
+			$(this).addClass("less");
+			if ($("#mla").text() === $moreTextIt) {
+				$("#mla").text($lessTextIt);
+			}
+			else {
+				$("#mla").text($lessTextEn);
+			}
+			$('.text-more').css('display','block');
+		}
+		
+		return false;
+	});
+	//fine leggi tutto
+	
+	
+});
+		
+		
+$( window ).resize(function() {
+	hoverMenu();
+	dropdownToggle();
+	
+	//altezza di azuremediaplayer in base all'aspect-ratio 16/9
+	$(".azuremediaplayer").height(($(".azuremediaplayer").width()*9)/16);
+	
+	if ($(window).width() > 1200) {
+		if($("#sticky-main-menu").is(':hidden')){
+			$("#sticky-main-menu").show();
+		};
+	};
+});
+
+
+function hoverMenu() {
+	 if ($(window).width() > 767) {
+		 //permetto alle voci principali di menu di essere cliccabili
+		  $(".dropdown-toggle").addClass("disabled"); 
+	 } else {
+		  $(".dropdown-toggle").removeClass("disabled"); 
+		  }
+	
+
+	 if ($(window).width() > 992) {
+		  $('.dropdown').on('mouseenter', function(e) {
+					$('.dropdown-menu', this).stop( true, true ).fadeIn("fast");
+					$(this).addClass('open');
+		  });
+		  $('.dropdown').on('mouseleave', function(e) {
+					$('.dropdown-menu', this).stop( true, true ).fadeOut("fast");
+					$(this).removeClass('open');
+		  });	 
+	 } else {
+				
+		 var $open = false;
+		 $('.dropdown').off('mouseenter mouseleave');
+	 };
+};
+
+
+function controlloTestata(){
+    var $window = $(window);
+    var $testataLetterbox = $('#sticky-menu');
+    var $inizioScroll = $("header").height();
+
+    $window.on('scroll', function(){
+      if( $inizioScroll < $window.scrollTop() ){
+        $testataLetterbox.fadeIn(0).animate({'top': '0px'}, 400);
+      }else{
+        $testataLetterbox.stop(true).animate({'top': '-120px'});
+      }
+    });
+  }
+
+
+
+//A string replace function
+function str_replace(haystack, needle, replacement) {
+	var temp = haystack.split(needle);
+	return temp.join(replacement);
+}
+
+
+function checkCookie_eu()
+{
+
+	var consent = getCookie_eu("cookies_consent");
+	if (consent == null || consent == "" || consent == undefined)
+	{
+		// show notification bar
+		$('#cookie_directive_container').show();
+	}
+}
+
+function setCookie_eu(c_name,value,exdays)
+{
+	var exdate = new Date();
+	exdate.setDate(exdate.getDate() + exdays);
+	var c_value = escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+	document.cookie = c_name + "=" + c_value+"; path=/";
+	$('#cookie_directive_container').hide('slow');
+}
+
+
+function getCookie_eu(c_name)
+{
+	var i,x,y,ARRcookies=document.cookie.split(";");
+	for (i=0;i<ARRcookies.length;i++)
+	{
+		x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+		y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+		x=x.replace(/^\s+|\s+$/g,"");
+		if (x==c_name)
+		{
+			return unescape(y);
+		}
+	}
+}
+
+
+function dropdownToggle () {
+	 if ($(window).width() < 767) {
+		  $("#sticky-dropdown-toggle-button").addClass("dropdown-toggle"); 
+	 } else {
+		  $("#sticky-dropdown-toggle-button").removeClass("dropdown-toggle"); 
+		  }
+};
+
+
+function playVideo(idVideo) {
+     var myOptions = {
+            "nativeControlsForTouch": false,
+            controls: true,
+            autoplay: true,
+            logo: { "enabled": false },
+            width: "100%",
+            height: "350",
+            aspectratio: "16:9",
+
+            techOrder: ["azureHtml5JS", "flashSS", "silverlightSS", "html5"]
+
+        }
+
+        myPlayer = amp("azuremediaplayer", myOptions);
+
+       $.get("https://webtv.enav.it/webapi/video/"+idVideo+"/urlfile").done(function (data) {
+            myPlayer.src([
+                {
+                    "src": data,
+                    "type": "application/vnd.ms-sstr+xml"
+                }
+        ]);
+        });
+
+}
+
+function playVideoSx(idVideo) {
+     var myOptions = {
+            "nativeControlsForTouch": false,
+            controls: true,
+            autoplay: true,
+            logo: { "enabled": false },
+            width: "318",
+            height: "180",
+            aspectratio: "16:9",
+            poster: "https://webtv.enav.it/webapi/thumb/v3/eventi/"+idVideo,
+            techOrder: ["azureHtml5JS", "flashSS", "silverlightSS", "html5"]
+
+        }
+
+        myPlayer = amp("azuremediaplayer", myOptions);
+        
+       $.get("https://webtv.enav.it/webapi/video/"+idVideo+"/urlfile").done(function (data) {
+            myPlayer.src([
+                {
+                    "src": data,
+                    "type": "application/vnd.ms-sstr+xml"
+                }
+        ]);
+        });
+
+}
+
+function playVideoBox(idVideo) {
+     var myOptions = {
+            "nativeControlsForTouch": false,
+            controls: true,
+            autoplay: true,
+            logo: { "enabled": false },
+            width: "100%",
+            //height: "100%",
+            aspectratio: "16:9",
+            poster: "https://webtv.enav.it/webapi/thumb/v3/default/"+idVideo,
+            techOrder: ["azureHtml5JS", "flashSS", "silverlightSS", "html5"]
+
+        }
+
+
+        myPlayer = amp("azuremediaplayer", myOptions);
+
+//altezza di azuremediaplayer in base all'aspect-ratio 16/9
+	$(".azuremediaplayer").height(($(".azuremediaplayer").width()*9)/16);
+	
+       $.get("https://webtv.enav.it/webapi/video/"+idVideo+"/urlfile").done(function (data) {
+            myPlayer.src([
+                {
+                    "src": data,
+                    "type": "application/vnd.ms-sstr+xml"
+                }
+        ]);
+        });
+		
+		
+	
+}
+
+// resize caption per foglia immagine libera
+function resizeCaption(){
+	var w = $("#image-libera-img").width();
+	var p = 2 * parseInt($("#image-libera-caption").css("padding-left").replace("px",""));
+	$("#image-libera-caption").width( w - p);
+}
+
+// sticky e modale
+$(window).on('shown.bs.modal', function() { 
+    $("#sticky-menu").stop(true).animate({'top': '-120px'});
+});

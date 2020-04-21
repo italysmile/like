@@ -1,0 +1,291 @@
+var parentPageId = "";
+var $currentPage = null;
+var $parentPage = null;
+var positionInParent = 0;
+
+//Page list that must be shown in the mobile menu
+var $currentList = null;
+//Item id of currentList related to the current page
+var $activeID = 0;
+
+//Level of current page
+var $level = 1;
+
+//Parent of current page
+var $parentEntry = null;
+//Current page
+var $currentEntry = null;
+//Child list of current page
+var $childList = null;
+//Slowdown item
+var $slowDownEntry = null;
+
+var containerLeaf = $('#page-with-sidebar');
+
+function sidebarAnalyze(){
+    $parent = $currentPage.parent();
+    if ( 'sidebar-root' != $parent.attr('id') ){
+        $parentPage = $parent.parent();
+        parentPageId = $parentPage.attr('data-wcs-id');
+    }
+    positionInParent = $currentPage.index();
+}
+
+function sidebarSet(){
+    if ( null != $parentPage && $parentPage.length > 0 ){
+        $parentPage.removeClass('init-arrow-down');
+        $parentPage.removeClass('arrow-down');
+        $parentPage.addClass('arrow-up');
+        $parentPage.addClass('active');
+        $parentPage.addClass('selected');
+    }
+
+    if ( null != $currentPage && $currentPage.length > 0 ){
+        $currentPage.addClass('active');
+        $currentPage.addClass('selected');
+        if ( null != $parentPage && $parentPage.length > 0 ){
+            $parentPage.children('ul').css('display', 'block');
+        }
+        if ( $currentPage.children("ul").length > 0 ){
+            $currentPage.removeClass('init-arrow-down');
+            $currentPage.addClass('arrow-up');
+            $currentPage.children('ul').css('display', 'block');
+        }
+    }
+	
+	/*if( null != $slowDownEntry ){
+		console.log($('#sidebar-root').find('li[data-wcs-id="' + $slowDownEntry.id + '"]').length);
+		$('#sidebar-root').find('li[data-wcs-id="' + $slowDownEntry.id + '"]').slideDown(300);
+	}*/
+}
+
+function analyzeSectionPlan(){
+    var root = sectionSitePlan.sectionPlan;
+
+    $activeID = 0;
+
+    if ( typeof currentPageId == "undefined" || null == currentPageId ){
+        return;
+    }
+
+    for (var i = 0; i < root.length; i++) {
+
+        var data_a = root[i];
+
+        if(data_a.id == currentPageId) {
+            $currentEntry = data_a;
+            $currentList = data_a.children;
+            $level = 2;
+
+            $parentEntry = null;
+            $childList = null;
+			$slowDownEntry = data_a;
+
+            return;
+        }
+
+        var secondLevel = data_a.children;
+
+        for (var j = 0; j < secondLevel.length; j++) {
+
+            var data_b = secondLevel[j];
+
+            if (data_b.id == currentPageId) {
+                $currentEntry = data_b;
+                $currentList = data_a.children;
+                $activeID = j;
+                $level = 3;
+
+                $parentEntry = data_a;
+                $childList = data_b.children;
+				$slowDownEntry = data_a;
+
+                return;
+            }
+
+            var thirdLevel = data_b.children;
+
+            for (var k = 0; k < thirdLevel.length; k++) {
+
+                var data_c = thirdLevel[k];
+
+                if (data_c.id == currentPageId) {
+                    $currentEntry = data_c;
+                    $currentList = data_a.children;
+                    $level = 4;
+
+                    $parentEntry = data_b;
+                    $childList = thirdLevel;
+					$slowDownEntry = data_a;
+
+                    return;
+                }
+            }
+
+        }
+
+    }
+}
+
+function buildMenuMobile() {
+    var menuGUI = containerLeaf.find('#terzo-livello-mobile').find('.carousel-inner');
+	
+	if($level == 1){
+		return;
+	}
+
+    if(null == $currentList || $currentList.length == 0){
+        containerLeaf.find('#terzo-livello-mobile').remove();
+		return;
+    }    
+
+    for (var i = 0; i < $currentList.length; i++) {
+        var classItem = "item";
+        var nextItem = i+1;
+
+        if($activeID == i || $activeID == nextItem) {
+            classItem = "item active";
+        }
+
+        var menuItem = "<div class=\""+classItem+"\">";
+
+        if($currentList[i].hrefClass == ""){
+            menuItem = menuItem + "<div class=\"col-xs-6\"><a href=\""+$currentList[i].link+"\">"+$currentList[i].label+"</a></div>";
+        }
+        else{
+            menuItem = menuItem + "<div class=\"col-xs-6\"><a href=\""+$currentList[i].link+"\" target=\""+$currentList[i].hrefClass+"\">"+$currentList[i].label+"</a></div>";
+        }
+
+        if(nextItem < $currentList.length){
+
+            if($currentList[nextItem].hrefClass == ""){
+                menuItem = menuItem + "<div class=\"col-xs-6\"><a href=\""+$currentList[nextItem].link+"\">"+$currentList[nextItem].label+"</a></div>";
+            }
+            else{
+                menuItem = menuItem + "<div class=\"col-xs-6\"><a href=\""+$currentList[nextItem].link+" target=\""+obj[nextItem].hrefClass+"\">"+$currentList[nextItem].label+"</a></div>";
+            }
+
+            i++;
+        }
+
+        menuItem = menuItem + "</div>";
+
+        menuGUI.append(menuItem);
+    }
+}
+
+function buildFourthLevelMenu() {
+
+    if($level < 3 ||  (enavWCSsubtype != 'CMS_FirstLevelPage'  && enavWCSsubtype != 'TitoloInBorsa')){
+            return;
+	}
+
+    var menuGUI = containerLeaf.find('ul.quarto-livello');
+
+    for (var i = 0; i < $childList.length; i++) {
+        var classItem = null;
+        var data = $childList[i];
+		
+		if(currentPageId == data.id){
+            classItem = "active";
+        }
+
+        var menuItem = null;
+
+        if(classItem != null){
+            if(data.hrefClass == "") {
+                menuItem = "<li class=\"" + classItem + "\"><a href=\"" + data.link + "\">" + data.label + "</a></li>";
+            }
+            else{
+                menuItem = "<li class=\"" + classItem + "\"><a href=\"" + data.link + "\" target=\""+data.hrefClass+"\">" + data.label + "</a></li>";
+            }
+        }
+        else{
+            if(data.hrefClass == "") {
+                menuItem = "<li><a href=\"" + data.link + "\">" + data.label + "</a></li>";
+            }
+            else{
+                menuItem = "<li><a href=\"" + data.link + "\" target=\""+data.hrefClass+"\">" + data.label + "</a></li>";
+            }
+        }
+
+        menuGUI.append(menuItem);
+    }
+}
+
+function setTitle() {
+    if(enavWCSsubtype == 'CMS_FirstLevelPage' || enavWCSsubtype == 'Weather' || enavWCSsubtype == 'TitoloInBorsa'){
+        if(typeof enavWeatherType !== "undefined" && null != enavWeatherType && enavWeatherType == 'Temperature'){
+            containerLeaf.find('div.col-lg-5[wcs-level="4"]').prepend("<h2>"+$currentEntry.title+"</h2>")
+        }
+        else if($level == 4){
+            containerLeaf.find('div.col-lg-5[wcs-level="4"]').prepend("<h2>"+$parentEntry.title+"</h2>")
+        }
+        else if($level == 3 && $childList.length > 0){
+            containerLeaf.find('div.col-lg-5[wcs-level="4"]').prepend("<h2>"+$currentEntry.title+"</h2>")
+        }
+        else{
+			if (null != $currentEntry){
+				containerLeaf.find('#main-content').find('.main-text').prepend("<h2>"+$currentEntry.title+"</h2>")
+			} else if(null != auxTitle){
+					containerLeaf.find('#main-content').find('.main-text').prepend("<h2>" + auxTitle +"</h2>")
+				 }
+        }
+    }
+}
+
+function removeContanier(){
+    if(enavWCSsubtype == 'CMS_FirstLevelPage'  || enavWCSsubtype == 'TitoloInBorsa'){
+        if(($level < 3) || ($level==3 && $childList.length == 0)) {
+            containerLeaf.find('div.box-text[wcs-level="4"]').contents().unwrap();
+            containerLeaf.find('div.tab-pane.quarto-livello[wcs-level="4"]').contents().unwrap();
+            containerLeaf.find('div.tab-content[wcs-level="4"]').contents().unwrap();
+
+            containerLeaf.find('div.col-lg-5[wcs-level="4"]').contents().unwrap();
+            containerLeaf.find('div.row.quarto-livello.hidden-print[wcs-level="4"]').contents().unwrap();
+
+            containerLeaf.find('div.col-lg-7[wcs-level="4"]').remove();
+        }
+        else if($level==3 && $childList.length > 0){
+            containerLeaf.find('div.box-text[wcs-level="4"]').contents().unwrap();
+            containerLeaf.find('div.tab-pane.quarto-livello[wcs-level="4"]').contents().unwrap();
+            containerLeaf.find('div.tab-content[wcs-level="4"]').contents().unwrap();
+        }
+        else{
+            containerLeaf.find('div.tab-content[wcs-level="4"]').show();
+        }
+    }
+    else if(enavWCSsubtype == 'Weather'){
+        containerLeaf.find('div.box-text[wcs-level="4"]').contents().unwrap();
+        containerLeaf.find('div.tab-pane.quarto-livello[wcs-level="4"]').contents().unwrap();
+        containerLeaf.find('div.tab-content[wcs-level="4"]').contents().unwrap();
+    }
+}
+
+function cacheOptimisation(){
+	analyzeSectionPlan();
+
+    if ( typeof currentPageId !== "undefined" && null != currentPageId){
+        $el = $('#sidebar-root').find('li[data-wcs-id="' + currentPageId + '"]');
+
+        if($level == 4){
+            $el = $('#sidebar-root').find('li[data-wcs-id="' + $parentEntry.id + '"]');
+        }
+
+        if ( $el.length > 0 ){
+            $currentPage = $el;
+            sidebarAnalyze();
+        }
+
+        
+        setTitle();
+        
+        removeContanier();
+        
+        buildFourthLevelMenu();
+    }
+
+    sidebarSet();
+
+    buildMenuMobile();
+}
